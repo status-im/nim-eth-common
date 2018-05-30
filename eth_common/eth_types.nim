@@ -10,10 +10,14 @@ type
   BloomFilter* = StUint[2048]
   EthAddress* = MDigest[160]
 
+  GasInt* = int64
+  ## Type alias used for gas computation
+  # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
+
   Transaction* = object
     accountNonce*:  uint64
-    gasPrice*:      UInt256
-    gasLimit*:      uint64
+    gasPrice*:      GasInt
+    gasLimit*:      GasInt
     to*:            EthAddress
     value*:         UInt256
     payload*:       Blob
@@ -21,7 +25,7 @@ type
 
   BlockHeader* = object
     parentHash*:    Hash256
-    uncleHash*:     Hash256
+    ommersHash*:    Hash256
     coinbase*:      EthAddress
     stateRoot*:     Hash256
     txRoot*:        Hash256
@@ -29,8 +33,8 @@ type
     bloom*:         BloomFilter
     difficulty*:    UInt256
     blockNumber*:   uint
-    gasLimit*:      uint64
-    gasUsed*:       uint64
+    gasLimit*:      GasInt
+    gasUsed*:       GasInt
     timestamp*:     uint64
     extraData*:     Blob
     mixDigest*:     Hash256
@@ -47,7 +51,7 @@ type
 
   Receipt* = object
     stateRoot*:     Blob
-    gasUsed*:       uint64
+    gasUsed*:       GasInt
     bloom*:         BloomFilter
     logs*:          seq[Log]
 
@@ -59,7 +63,7 @@ type
     shard*:         uint
     to*:            EthAddress
     data*:          Blob
-    gas*:           uint64
+    gas*:           GasInt
     accessList*:    AccessList
     code*:          Blob
     salt*:          Hash256
