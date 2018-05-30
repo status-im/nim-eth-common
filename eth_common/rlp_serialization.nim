@@ -12,3 +12,7 @@ proc read*(rlp: var Rlp, T: typedesc[EthTime]): T {.inline.} =
 
 proc append*(rlpWriter: var RlpWriter, t: EthTime) {.inline.} =
   rlpWriter.append(t.toUnix())
+
+
+proc rlpHash*[T](v: T): Hash256 =
+  keccak256.digest(rlp.encode(v).toOpenArray)

@@ -9,4 +9,5 @@ requires "nim > 0.18.0",
          "rlp",
          "nimcrypto",
          "ranges",
-         "stint"
+         "stint",
+         "https://github.com/status-im/nim-byteutils"
