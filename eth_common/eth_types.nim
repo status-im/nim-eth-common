@@ -8,7 +8,7 @@ type
   Blob* = seq[byte]
 
   BloomFilter* = StUint[2048]
-  EthAddress* = MDigest[160]
+  EthAddress* = array[20, byte]
 
   GasInt* = int64
   ## Type alias used for gas computation
@@ -23,6 +23,8 @@ type
     payload*:       Blob
     V*, R*, S*:     UInt256
 
+  BlockNumber* = UInt256
+
   BlockHeader* = object
     parentHash*:    Hash256
     ommersHash*:    Hash256
@@ -32,10 +34,10 @@ type
     receiptRoot*:   Hash256
     bloom*:         BloomFilter
     difficulty*:    UInt256
-    blockNumber*:   uint
+    blockNumber*:   BlockNumber
     gasLimit*:      GasInt
     gasUsed*:       GasInt
-    timestamp*:     uint64
+    timestamp*:     EthTime
     extraData*:     Blob
     mixDigest*:     Hash256
     nonce*:         BlockNonce
@@ -77,15 +79,15 @@ type
     coinbase*:      EthAddress
     stateRoot*:     Hash256
     receiptRoot*:   Hash256
-    blockNumber*:   uint
+    blockNumber*:   BlockNumber
 
   HashOrNum* = object
     case isHash*: bool
     of true:
       hash*: Hash256
     else:
-      number*: uint
+      number*: BlockNumber
 
   BlocksRequest* = object
     startBlock*: HashOrNum
-    maxResults*, skip*, reverse*: uint
+    maxResults*, skip*, reverse*: uint64
