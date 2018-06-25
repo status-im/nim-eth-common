@@ -23,7 +23,7 @@ type
     payload*:       Blob
     V*, R*, S*:     UInt256
 
-  BlockNumber* = UInt256
+  BlockNumber* = int64
 
   BlockHeader* = object
     parentHash*:    Hash256
