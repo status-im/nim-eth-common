@@ -4,6 +4,8 @@ type
   Hash256* = MDigest[256]
   EthTime* = Time
 
+  VMWord* = UInt256
+
   BlockNonce* = UInt256
   Blob* = seq[byte]
 
@@ -23,7 +25,7 @@ type
     payload*:       Blob
     V*, R*, S*:     UInt256
 
-  BlockNumber* = int64
+  BlockNumber* = UInt256
 
   BlockHeader* = object
     parentHash*:    Hash256
@@ -91,3 +93,26 @@ type
   BlocksRequest* = object
     startBlock*: HashOrNum
     maxResults*, skip*, reverse*: uint64
+
+when BlockNumber is int64:
+  ## The goal of these templates is to make it easier to switch
+  ## the block number type to a different representation
+  template vmWordToBlockNumber*(word: VMWord): BlockNumber =
+    BlockNumber(word.toInt)
+
+  template blockNumberToVmWord*(n: BlockNumber): VMWord =
+    u256(n)
+
+  template toBlockNumber*(n: SomeInteger): BlockNumber =
+    int64(n)
+
+else:
+  template vmWordToBlockNumber*(word: VMWord): BlockNumber =
+    word
+
+  template blockNumberToVmWord*(n: BlockNumber): VMWord =
+    n
+
+  template toBlockNumber*(n: SomeInteger): BlockNumber =
+    u256(n)
+
