@@ -1,4 +1,5 @@
-import stint, nimcrypto, times
+import stint, nimcrypto, times, rlp
+export stint
 
 type
   Hash256* = MDigest[256]
@@ -115,4 +116,35 @@ else:
 
   template toBlockNumber*(n: SomeInteger): BlockNumber =
     u256(n)
+
+#
+# Rlp serialization:
+#
+
+proc read*(rlp: var Rlp, T: typedesc[Stint|StUint]): T {.inline.} =
+  if rlp.isBlob:
+    result = readUintBE[result.bits](rlp.toBytes.toOpenArray)
+  else:
+    result = rlp.getByteValue.to(T)
+
+proc append*(rlpWriter: var RlpWriter, value: Stint|StUint) =
+  rlpWriter.append value.toByteArrayBE
+
+
+proc read*(rlp: var Rlp, T: typedesc[MDigest]): T {.inline.} =
+  result.data = rlp.read(type(result.data))
+
+proc append*(rlpWriter: var RlpWriter, a: MDigest) {.inline.} =
+  rlpWriter.append(a.data)
+
+
+proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
+  result = fromUnix(rlp.read(int64))
+
+proc append*(rlpWriter: var RlpWriter, t: Time) {.inline.} =
+  rlpWriter.append(t.toUnix())
+
+
+proc rlpHash*[T](v: T): Hash256 =
+  keccak256.digest(rlp.encode(v).toOpenArray)
 
