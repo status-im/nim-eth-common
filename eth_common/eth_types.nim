@@ -121,14 +121,33 @@ else:
 # Rlp serialization:
 #
 
+func trailingNonZeros(val: openarray[byte]): int =
+  for i in countdown(val.len - 1, 0):
+    if val[i] == 0:
+      return val.len - i - 1
+
+  return val.len
+
 proc read*(rlp: var Rlp, T: typedesc[Stint|StUint]): T {.inline.} =
   if rlp.isBlob:
-    result = readUintBE[result.bits](rlp.toBytes.toOpenArray)
+    let bytes = rlp.toBytes
+    if bytes.len > 0:
+      result = readUintBE[result.bits](bytes.toOpenArray)
+    else:
+      result = 0.to(T)
   else:
     result = rlp.getByteValue.to(T)
 
+  rlp.skipElem
+
 proc append*(rlpWriter: var RlpWriter, value: Stint|StUint) =
-  rlpWriter.append value.toByteArrayBE
+  if value > 128:
+    let bytes = value.toByteArrayBE
+    let nonZeroBytes = trailingNonZeros(bytes)
+    rlpWriter.append bytes.toOpenArray(bytes.len - nonZeroBytes,
+                                       bytes.len - 1)
+  else:
+    rlpWriter.append(value.toInt)
 
 
 proc read*(rlp: var Rlp, T: typedesc[MDigest]): T {.inline.} =
