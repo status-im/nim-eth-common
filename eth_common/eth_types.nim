@@ -121,22 +121,13 @@ else:
 # Rlp serialization:
 #
 
-func trailingNonZeros(val: openarray[byte]): int =
-  for i in countdown(val.len - 1, 0):
-    if val[i] == 0:
-      return val.len - i - 1
-
-  return val.len
-
 proc read*(rlp: var Rlp, T: typedesc[StUint]): T {.inline.} =
   if rlp.isBlob:
     let bytes = rlp.toBytes
     if bytes.len > 0:
-      result = readUintBE[result.bits](bytes.toOpenArray)
+      result.initFromBytesBE(bytes.toOpenArray)
     else:
       result = 0.to(T)
-  elif rlp.isSingleByte:
-    result = rlp.getByteValue.to(T)
   else:
     raise newException(RlpTypeMismatch, "Unsigned integer expected, but the source RLP is a list")
 
@@ -145,7 +136,7 @@ proc read*(rlp: var Rlp, T: typedesc[StUint]): T {.inline.} =
 proc append*(rlpWriter: var RlpWriter, value: StUint) =
   if value > 128:
     let bytes = value.toByteArrayBE
-    let nonZeroBytes = trailingNonZeros(bytes)
+    let nonZeroBytes = significantBytesBE(bytes)
     rlpWriter.append bytes.toOpenArray(bytes.len - nonZeroBytes,
                                        bytes.len - 1)
   else:
