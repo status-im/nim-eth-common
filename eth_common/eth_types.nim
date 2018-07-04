@@ -128,19 +128,21 @@ func trailingNonZeros(val: openarray[byte]): int =
 
   return val.len
 
-proc read*(rlp: var Rlp, T: typedesc[Stint|StUint]): T {.inline.} =
+proc read*(rlp: var Rlp, T: typedesc[StUint]): T {.inline.} =
   if rlp.isBlob:
     let bytes = rlp.toBytes
     if bytes.len > 0:
       result = readUintBE[result.bits](bytes.toOpenArray)
     else:
       result = 0.to(T)
-  else:
+  elif rlp.isSingleByte:
     result = rlp.getByteValue.to(T)
+  else:
+    raise newException(RlpTypeMismatch, "Unsigned integer expected, but the source RLP is a list")
 
   rlp.skipElem
 
-proc append*(rlpWriter: var RlpWriter, value: Stint|StUint) =
+proc append*(rlpWriter: var RlpWriter, value: StUint) =
   if value > 128:
     let bytes = value.toByteArrayBE
     let nonZeroBytes = trailingNonZeros(bytes)
@@ -149,6 +151,17 @@ proc append*(rlpWriter: var RlpWriter, value: Stint|StUint) =
   else:
     rlpWriter.append(value.toInt)
 
+proc read*(rlp: var Rlp, T: typedesc[Stint]): T {.inline.} =
+  # The Ethereum Yellow Paper defines the RLP serialization only
+  # for unsigned integers:
+  {.error: "RLP serialization of signed integers is not allowed".}
+  discard
+
+proc append*(rlpWriter: var RlpWriter, value: Stint) =
+  # The Ethereum Yellow Paper defines the RLP serialization only
+  # for unsigned integers:
+  {.error: "RLP serialization of signed integers is not allowed".}
+  discard
 
 proc read*(rlp: var Rlp, T: typedesc[MDigest]): T {.inline.} =
   result.data = rlp.read(type(result.data))
