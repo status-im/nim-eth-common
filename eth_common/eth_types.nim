@@ -3,6 +3,8 @@ export stint
 
 type
   Hash256* = MDigest[256]
+  KeccakHash* = Hash256
+
   EthTime* = Time
 
   VMWord* = UInt256
@@ -12,6 +14,8 @@ type
 
   BloomFilter* = StUint[2048]
   EthAddress* = array[20, byte]
+
+  Difficulty* = UInt256
 
   GasInt* = int64
   ## Type alias used for gas computation
@@ -94,6 +98,8 @@ type
   BlocksRequest* = object
     startBlock*: HashOrNum
     maxResults*, skip*, reverse*: uint64
+
+  AbstractChainDB* = ref object
 
 when BlockNumber is int64:
   ## The goal of these templates is to make it easier to switch
