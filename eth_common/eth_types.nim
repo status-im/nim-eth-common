@@ -101,6 +101,9 @@ type
 
   AbstractChainDB* = ref object
 
+  BlockHeaderRef* = ref BlockHeader
+  BlockBodyRef* = ref BlockBody
+
 when BlockNumber is int64:
   ## The goal of these templates is to make it easier to switch
   ## the block number type to a different representation
@@ -173,7 +176,25 @@ proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
 proc append*(rlpWriter: var RlpWriter, t: Time) {.inline.} =
   rlpWriter.append(t.toUnix())
 
-
 proc rlpHash*[T](v: T): Hash256 =
   keccak256.digest(rlp.encode(v).toOpenArray)
+
+template notImplemented =
+  assert false, "Method not impelemented"
+
+template deref*(r: BlockHeaderRef | BlockBodyRef): auto =
+  r[]
+
+method genesisHash*(db: AbstractChainDb): KeccakHash =
+  notImplemented
+
+method getBlockHeader*(db: AbstractChainDb, b: HashOrNum): BlockHeaderRef =
+  notImplemented
+
+method getSuccessorHeader*(db: AbstractChainDb,
+                           h: BlockHeader): BlockHeaderRef =
+  notImplemented
+
+method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef =
+  notImplemented
 
