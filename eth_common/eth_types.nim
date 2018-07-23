@@ -15,8 +15,7 @@ type
   BloomFilter* = StUint[2048]
   EthAddress* = array[20, byte]
 
-  Difficulty* = UInt256
-
+  DifficultyInt* = UInt256
   GasInt* = int64
   ## Type alias used for gas computation
   # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
