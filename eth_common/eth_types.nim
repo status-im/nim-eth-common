@@ -39,7 +39,7 @@ type
     txRoot*:        Hash256
     receiptRoot*:   Hash256
     bloom*:         BloomFilter
-    difficulty*:    UInt256
+    difficulty*:    DifficultyInt
     blockNumber*:   BlockNumber
     gasLimit*:      GasInt
     gasUsed*:       GasInt
@@ -96,7 +96,8 @@ type
 
   BlocksRequest* = object
     startBlock*: HashOrNum
-    maxResults*, skip*, reverse*: uint64
+    maxResults*, skip*: uint
+    reverse*: bool
 
   AbstractChainDB* = ref object
 
@@ -124,6 +125,9 @@ else:
 
   template toBlockNumber*(n: SomeInteger): BlockNumber =
     u256(n)
+
+func blockHash*(h: BlockHeader): KeccakHash =
+  assert false, "not implemented yet"
 
 #
 # Rlp serialization:
@@ -188,6 +192,9 @@ method genesisHash*(db: AbstractChainDb): KeccakHash =
   notImplemented
 
 method getBlockHeader*(db: AbstractChainDb, b: HashOrNum): BlockHeaderRef =
+  notImplemented
+
+method getBestBlockHeader*(db: AbstractChainDb): BlockHeaderRef =
   notImplemented
 
 method getSuccessorHeader*(db: AbstractChainDb,
