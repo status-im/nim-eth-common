@@ -99,7 +99,7 @@ type
     maxResults*, skip*: uint
     reverse*: bool
 
-  AbstractChainDB* = ref object
+  AbstractChainDB* = ref object of RootRef
 
   BlockHeaderRef* = ref BlockHeader
   BlockBodyRef* = ref BlockBody
