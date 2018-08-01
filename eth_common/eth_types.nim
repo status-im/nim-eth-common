@@ -1,4 +1,4 @@
-import stint, nimcrypto, times, rlp
+import stint, nimcrypto, times, rlp, endians
 export stint
 
 type
@@ -9,10 +9,10 @@ type
 
   VMWord* = UInt256
 
-  BlockNonce* = UInt256
+  BlockNonce* = array[8, byte]
   Blob* = seq[byte]
 
-  BloomFilter* = StUint[2048]
+  BloomFilter* = array[256, byte]
   EthAddress* = array[20, byte]
 
   DifficultyInt* = UInt256
@@ -126,8 +126,11 @@ else:
   template toBlockNumber*(n: SomeInteger): BlockNumber =
     u256(n)
 
-func blockHash*(h: BlockHeader): KeccakHash =
-  assert false, "not implemented yet"
+proc toBlockNonce*(n: uint64): BlockNonce =
+  bigEndian64(addr result[0], unsafeAddr n)
+
+proc toUint*(n: BlockNonce): uint64 =
+  bigEndian64(addr result, unsafeAddr n[0])
 
 #
 # Rlp serialization:
@@ -182,25 +185,26 @@ proc append*(rlpWriter: var RlpWriter, t: Time) {.inline.} =
 proc rlpHash*[T](v: T): Hash256 =
   keccak256.digest(rlp.encode(v).toOpenArray)
 
-template notImplemented =
+func blockHash*(h: BlockHeader): KeccakHash {.inline.} = rlpHash(h)
+
+proc notImplemented =
   assert false, "Method not impelemented"
 
 template deref*(r: BlockHeaderRef | BlockBodyRef): auto =
   r[]
 
-method genesisHash*(db: AbstractChainDb): KeccakHash =
-  notImplemented
+method genesisHash*(db: AbstractChainDb): KeccakHash {.base.} =
+  notImplemented()
 
-method getBlockHeader*(db: AbstractChainDb, b: HashOrNum): BlockHeaderRef =
-  notImplemented
+method getBlockHeader*(db: AbstractChainDb, b: HashOrNum): BlockHeaderRef {.base.} =
+  notImplemented()
 
-method getBestBlockHeader*(db: AbstractChainDb): BlockHeaderRef =
-  notImplemented
+method getBestBlockHeader*(db: AbstractChainDb): BlockHeaderRef {.base.} =
+  notImplemented()
 
 method getSuccessorHeader*(db: AbstractChainDb,
-                           h: BlockHeader): BlockHeaderRef =
-  notImplemented
+                           h: BlockHeader): BlockHeaderRef {.base.} =
+  notImplemented()
 
-method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef =
-  notImplemented
-
+method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef {.base.} =
+  notImplemented()
