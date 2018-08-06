@@ -179,6 +179,19 @@ proc append*(rlpWriter: var RlpWriter, a: MDigest) {.inline.} =
 proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
   result = fromUnix(rlp.read(int64))
 
+proc append*(rlpWriter: var RlpWriter, value: HashOrNum) =
+  case value.isHash
+  of true:
+    rlpWriter.append(value.hash)
+  else:
+    rlpWriter.append(value.number)
+
+proc read*(rlp: var Rlp, T: typedesc[HashOrNum]): T =
+  if rlp.blobLen == 32:
+    result = HashOrNum(isHash: true, hash: rlp.read(Hash256))
+  else:
+    result = HashOrNum(isHash: false, number: rlp.read(UInt256))
+
 proc append*(rlpWriter: var RlpWriter, t: Time) {.inline.} =
   rlpWriter.append(t.toUnix())
 
