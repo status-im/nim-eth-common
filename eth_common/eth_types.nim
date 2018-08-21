@@ -14,6 +14,8 @@ type
 
   BloomFilter* = array[256, byte]
   EthAddress* = array[20, byte]
+  
+  WhisperIdentity* = array[60, byte]
 
   DifficultyInt* = UInt256
   GasInt* = int64
