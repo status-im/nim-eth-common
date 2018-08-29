@@ -211,15 +211,18 @@ template deref*(r: BlockHeaderRef | BlockBodyRef): auto =
 method genesisHash*(db: AbstractChainDb): KeccakHash {.base.} =
   notImplemented()
 
-method getBlockHeader*(db: AbstractChainDb, b: HashOrNum): BlockHeaderRef {.base.} =
+method getBlockHeader*(db: AbstractChainDB, b: HashOrNum, output: var BlockHeader): bool =
   notImplemented()
 
-method getBestBlockHeader*(db: AbstractChainDb): BlockHeaderRef {.base.} =
+method getBestBlockHeader*(self: AbstractChainDB): BlockHeader =
   notImplemented()
 
-method getSuccessorHeader*(db: AbstractChainDb,
-                           h: BlockHeader): BlockHeaderRef {.base.} =
+method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool =
   notImplemented()
 
 method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef {.base.} =
   notImplemented()
+
+method persistBlocks*(db: AbstractChainDb, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
+  notImplemented()
+
