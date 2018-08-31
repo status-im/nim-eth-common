@@ -29,7 +29,8 @@ type
     to*:            EthAddress
     value*:         UInt256
     payload*:       Blob
-    V*, R*, S*:     UInt256
+    R*, S*:         UInt256
+    V*:             range[27..28]
 
   BlockNumber* = UInt256
 
