@@ -10,6 +10,7 @@ type
   VMWord* = UInt256
 
   BlockNonce* = array[8, byte]
+  AccountNonce* = uint64
   Blob* = seq[byte]
 
   BloomFilter* = array[256, byte]
@@ -23,7 +24,7 @@ type
   # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
 
   Transaction* = object
-    accountNonce*:  uint64
+    accountNonce*:  AccountNonce
     gasPrice*:      GasInt
     gasLimit*:      GasInt
     to*:            EthAddress
