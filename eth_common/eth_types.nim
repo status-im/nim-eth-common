@@ -228,3 +228,5 @@ method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef {
 method persistBlocks*(db: AbstractChainDb, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
   notImplemented()
 
+proc generateAddress*(address: EthAddress, nonce: AccountNonce): EthAddress =
+  result[0..19] = keccak256.digest(rlp.encodeList(address, nonce).toOpenArray).data[12..31]
