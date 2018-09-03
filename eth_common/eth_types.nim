@@ -31,7 +31,7 @@ type
     value*:         UInt256
     payload*:       Blob
     R*, S*:         UInt256
-    V*:             range[27..28]
+    V*:             byte
 
   BlockNumber* = UInt256
 
