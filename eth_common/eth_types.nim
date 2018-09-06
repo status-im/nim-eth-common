@@ -30,8 +30,8 @@ type
     to*:            EthAddress
     value*:         UInt256
     payload*:       Blob
-    R*, S*:         UInt256
     V*:             byte
+    R*, S*:         UInt256
 
   BlockNumber* = UInt256
 
