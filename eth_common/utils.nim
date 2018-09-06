@@ -10,3 +10,7 @@ proc toDigest*(hexString: static[string]): auto =
 
 proc parseAddress*(hexString: string): EthAddress =
   hexToByteArray(hexString, result)
+
+proc `$`*(a: EthAddress): string =
+  a.toHex()
+
