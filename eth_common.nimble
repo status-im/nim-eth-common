@@ -10,4 +10,4 @@ requires "nim > 0.18.0",
          "nimcrypto",
          "ranges",
          "stint",
-         "https://github.com/status-im/nim-byteutils"
+         "byteutils"
