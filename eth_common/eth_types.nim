@@ -27,11 +27,13 @@ type
     accountNonce*:  AccountNonce
     gasPrice*:      GasInt
     gasLimit*:      GasInt
-    to*:            EthAddress
+    to* {.rlpCustomSerialization: TxAddressTag.}: EthAddress
     value*:         UInt256
     payload*:       Blob
     V*:             byte
     R*, S*:         UInt256
+
+  TxAddressTag* = object # In transactions zero address is encoded as empty blob
 
   BlockNumber* = UInt256
 
@@ -172,6 +174,20 @@ proc append*(rlpWriter: var RlpWriter, value: Stint) =
   # for unsigned integers:
   {.error: "RLP serialization of signed integers is not allowed".}
   discard
+
+# BUG! The compilation is successfull with the following prox commented out, because this proc is ignored even if present
+# proc read*(rlp: var Rlp, T: typedesc[EthAddress], tag: type TxAddressTag): T {.inline.} =
+#   if rlp.blobLen != 0:
+#     result = rlp.read(EthAddress)
+#   else:
+#     rlp.skipElem
+
+proc append*(rlpWriter: var RlpWriter, a: EthAddress, tag: type TxAddressTag) {.inline.} =
+  var d: type(a)
+  if a == d:
+    rlpWriter.append("")
+  else:
+    rlpWriter.append(a)
 
 proc read*(rlp: var Rlp, T: typedesc[MDigest]): T {.inline.} =
   result.data = rlp.read(type(result.data))
