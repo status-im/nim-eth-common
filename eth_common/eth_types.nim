@@ -23,6 +23,8 @@ type
   ## Type alias used for gas computation
   # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
 
+  TxAddressTag* = object # In transactions zero address is encoded as empty blob
+
   Transaction* = object
     accountNonce*:  AccountNonce
     gasPrice*:      GasInt
@@ -32,8 +34,6 @@ type
     payload*:       Blob
     V*:             byte
     R*, S*:         UInt256
-
-  TxAddressTag* = object # In transactions zero address is encoded as empty blob
 
   BlockNumber* = UInt256
 
@@ -175,12 +175,11 @@ proc append*(rlpWriter: var RlpWriter, value: Stint) =
   {.error: "RLP serialization of signed integers is not allowed".}
   discard
 
-# BUG! The compilation is successfull with the following prox commented out, because this proc is ignored even if present
-# proc read*(rlp: var Rlp, T: typedesc[EthAddress], tag: type TxAddressTag): T {.inline.} =
-#   if rlp.blobLen != 0:
-#     result = rlp.read(EthAddress)
-#   else:
-#     rlp.skipElem
+proc read*(rlp: var Rlp, T: typedesc[EthAddress], tag: type TxAddressTag): T {.inline.} =
+ if rlp.blobLen != 0:
+   result = rlp.read(EthAddress)
+ else:
+   rlp.skipElem
 
 proc append*(rlpWriter: var RlpWriter, a: EthAddress, tag: type TxAddressTag) {.inline.} =
   var d: type(a)
