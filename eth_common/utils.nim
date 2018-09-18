@@ -9,7 +9,7 @@ proc toDigest*(hexString: static[string]): auto =
   toDigestAux(hexString.len div 2 * 8, hexString)
 
 proc parseAddress*(hexString: string): EthAddress =
-  hexToByteArray(hexString, result)
+  hexToPaddedByteArray[20](hexString)
 
 proc `$`*(a: EthAddress): string =
   a.toHex()
