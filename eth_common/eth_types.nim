@@ -32,6 +32,7 @@ type
     payload*:       Blob
     V*:             byte
     R*, S*:         UInt256
+    isContractCreation* {.rlpIgnore.}: bool
 
   BlockNumber* = UInt256
 
@@ -174,14 +175,14 @@ proc append*(rlpWriter: var RlpWriter, value: Stint) =
   discard
 
 proc read*(rlp: var Rlp, t: var Transaction, _: type EthAddress): EthAddress {.inline.} =
- if rlp.blobLen != 0:
-   result = rlp.read(EthAddress)
- else:
-   rlp.skipElem
+  if rlp.blobLen != 0:
+    result = rlp.read(EthAddress)
+  else:
+    t.isContractCreation = true
+    rlp.skipElem()
 
 proc append*(rlpWriter: var RlpWriter, t: Transaction, a: EthAddress) {.inline.} =
-  var d: type(a)
-  if a == d:
+  if t.isContractCreation:
     rlpWriter.append("")
   else:
     rlpWriter.append(a)
