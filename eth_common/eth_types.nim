@@ -214,7 +214,7 @@ proc append*(rlpWriter: var RlpWriter, t: Time) {.inline.} =
   rlpWriter.append(t.toUnix())
 
 proc rlpHash*[T](v: T): Hash256 =
-  keccak256.digest(rlp.encode(v).toOpenArray)
+  keccak256.digest(rlp.encode(v))
 
 func blockHash*(h: BlockHeader): KeccakHash {.inline.} = rlpHash(h)
 
