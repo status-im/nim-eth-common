@@ -1,9 +1,12 @@
-import stint, nimcrypto, times, rlp, endians
-export stint
+import
+  endians, options, times,
+  stint, nimcrypto, rlp, eth_trie/[defs, db]
+
+export
+  stint, read, append, KeccakHash
 
 type
   Hash256* = MDigest[256]
-  KeccakHash* = Hash256
 
   EthTime* = Time
 
@@ -23,6 +26,12 @@ type
   ## Type alias used for gas computation
   # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
 
+  Account* = object
+    nonce*:             AccountNonce
+    balance*:           UInt256
+    storageRoot*:       Hash256
+    codeHash*:          Hash256
+
   Transaction* = object
     accountNonce*:  AccountNonce
     gasPrice*:      GasInt
@@ -33,6 +42,17 @@ type
     V*:             byte
     R*, S*:         UInt256
     isContractCreation* {.rlpIgnore.}: bool
+
+  TransactionStatus* = enum
+    Unknown,
+    Queued,
+    Pending,
+    Included,
+    Error
+
+  TransactionStatusMsg* = object
+    status*: TransactionStatus
+    data*: Blob
 
   BlockNumber* = UInt256
 
@@ -104,10 +124,35 @@ type
     maxResults*, skip*: uint
     reverse*: bool
 
+  ProofRequest* = object
+    blockHash*: KeccakHash
+    accountKey*: Blob
+    key*: Blob
+    fromLevel*: uint
+
+  HeaderProofRequest* = object
+    chtNumber*: uint
+    blockNumber*: uint
+    fromLevel*: uint
+
+  ContractCodeRequest* = object
+    blockHash*: KeccakHash
+    key*: EthAddress
+
+  HelperTrieProofRequest* = object
+    subType*: uint
+    sectionIdx*: uint
+    key*: Blob
+    fromLevel*: uint
+    auxReq*: uint
+
   AbstractChainDB* = ref object of RootRef
 
   BlockHeaderRef* = ref BlockHeader
   BlockBodyRef* = ref BlockBody
+  ReceiptRef* = ref Receipt
+
+  EthResourceRefs = BlockHeaderRef | BlockBodyRef | ReceiptRef
 
 when BlockNumber is int64:
   ## The goal of these templates is to make it easier to switch
@@ -136,6 +181,12 @@ proc toBlockNonce*(n: uint64): BlockNonce =
 
 proc toUint*(n: BlockNonce): uint64 =
   bigEndian64(addr result, unsafeAddr n[0])
+
+proc newAccount*(nonce: AccountNonce = 0, balance: UInt256 = 0.u256): Account =
+  result.nonce = nonce
+  result.balance = balance
+  result.storageRoot = emptyRlpHash
+  result.codeHash = blankStringHash
 
 #
 # Rlp serialization:
@@ -187,12 +238,6 @@ proc append*(rlpWriter: var RlpWriter, t: Transaction, a: EthAddress) {.inline.}
   else:
     rlpWriter.append(a)
 
-proc read*(rlp: var Rlp, T: typedesc[MDigest]): T {.inline.} =
-  result.data = rlp.read(type(result.data))
-
-proc append*(rlpWriter: var RlpWriter, a: MDigest) {.inline.} =
-  rlpWriter.append(a.data)
-
 
 proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
   result = fromUnix(rlp.read(int64))
@@ -221,14 +266,28 @@ func blockHash*(h: BlockHeader): KeccakHash {.inline.} = rlpHash(h)
 proc notImplemented =
   assert false, "Method not impelemented"
 
-template deref*(r: BlockHeaderRef | BlockBodyRef): auto =
-  r[]
+template hasData*(b: Blob): bool = b.len > 0
+template hasData*(r: EthResourceRefs): bool = r != nil
 
-method genesisHash*(db: AbstractChainDb): KeccakHash {.base.} =
+template deref*(b: Blob): auto = b
+template deref*(o: Option): auto = o.get
+template deref*(r: EthResourceRefs): auto = r[]
+
+method genesisHash*(db: AbstractChainDB): KeccakHash {.base.} =
   notImplemented()
 
 method getBlockHeader*(db: AbstractChainDB, b: HashOrNum, output: var BlockHeader): bool =
   notImplemented()
+
+proc getBlockHeader*(db: AbstractChainDB, hash: KeccakHash): BlockHeaderRef =
+  new result
+  if not db.getBlockHeader(HashOrNum(isHash: true, hash: hash), result[]):
+    return nil
+
+proc getBlockHeader*(db: AbstractChainDB, b: BlockNumber): BlockHeaderRef =
+  new result
+  if not db.getBlockHeader(HashOrNum(isHash: false, number: b), result[]):
+    return nil
 
 method getBestBlockHeader*(self: AbstractChainDB): BlockHeader =
   notImplemented()
@@ -236,9 +295,39 @@ method getBestBlockHeader*(self: AbstractChainDB): BlockHeader =
 method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool =
   notImplemented()
 
-method getBlockBody*(db: AbstractChainDb, blockHash: KeccakHash): BlockBodyRef {.base.} =
+method getBlockBody*(db: AbstractChainDB, blockHash: KeccakHash): BlockBodyRef {.base.} =
   notImplemented()
 
-method persistBlocks*(db: AbstractChainDb, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
+method getReceipt*(db: AbstractChainDB, hash: KeccakHash): ReceiptRef =
+  notImplemented()
+
+method getStateDb*(db: AbstractChainDB): TrieDatabaseRef =
+  notImplemented()
+
+method getCodeByHash*(db: AbstractChainDB, hash: KeccakHash): Blob =
+  notImplemented()
+
+method getSetting*(db: AbstractChainDb, key: string): Bytes =
+  notImplemented()
+
+method setSetting*(db: AbstractChainDb, key: string, val: openarray[byte]) =
+  notImplemented()
+
+method getHeaderProof*(db: AbstractChainDB, req: ProofRequest): Blob =
+  notImplemented()
+
+method getProof*(db: AbstractChainDB, req: ProofRequest): Blob =
+  notImplemented()
+
+method getHelperTrieProof*(db: AbstractChainDB, req: HelperTrieProofRequest): Blob =
+  notImplemented()
+
+method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): TransactionStatusMsg =
+  notImplemented()
+
+method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) =
+  notImplemented()
+
+method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
   notImplemented()
 

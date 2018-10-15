@@ -7,6 +7,7 @@ skipDirs      = @["tests"]
 
 requires "nim > 0.18.0",
          "rlp",
+         "eth_trie",
          "nimcrypto",
          "ranges",
          "stint",
