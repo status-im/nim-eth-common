@@ -289,43 +289,43 @@ proc getBlockHeader*(db: AbstractChainDB, b: BlockNumber): BlockHeaderRef =
   if not db.getBlockHeader(HashOrNum(isHash: false, number: b), result[]):
     return nil
 
-method getBestBlockHeader*(self: AbstractChainDB): BlockHeader =
+method getBestBlockHeader*(self: AbstractChainDB): BlockHeader {.base.} =
   notImplemented()
 
-method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool =
+method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool {.base.} =
   notImplemented()
 
 method getBlockBody*(db: AbstractChainDB, blockHash: KeccakHash): BlockBodyRef {.base.} =
   notImplemented()
 
-method getReceipt*(db: AbstractChainDB, hash: KeccakHash): ReceiptRef =
+method getReceipt*(db: AbstractChainDB, hash: KeccakHash): ReceiptRef {.base.} =
   notImplemented()
 
-method getStateDb*(db: AbstractChainDB): TrieDatabaseRef =
+method getStateDb*(db: AbstractChainDB): TrieDatabaseRef {.base.} =
   notImplemented()
 
-method getCodeByHash*(db: AbstractChainDB, hash: KeccakHash): Blob =
+method getCodeByHash*(db: AbstractChainDB, hash: KeccakHash): Blob {.base.} =
   notImplemented()
 
-method getSetting*(db: AbstractChainDb, key: string): Bytes =
+method getSetting*(db: AbstractChainDb, key: string): Bytes {.base.} =
   notImplemented()
 
-method setSetting*(db: AbstractChainDb, key: string, val: openarray[byte]) =
+method setSetting*(db: AbstractChainDb, key: string, val: openarray[byte]) {.base.} =
   notImplemented()
 
-method getHeaderProof*(db: AbstractChainDB, req: ProofRequest): Blob =
+method getHeaderProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base.} =
   notImplemented()
 
-method getProof*(db: AbstractChainDB, req: ProofRequest): Blob =
+method getProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base.} =
   notImplemented()
 
-method getHelperTrieProof*(db: AbstractChainDB, req: HelperTrieProofRequest): Blob =
+method getHelperTrieProof*(db: AbstractChainDB, req: HelperTrieProofRequest): Blob {.base.} =
   notImplemented()
 
-method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): TransactionStatusMsg =
+method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): TransactionStatusMsg {.base.} =
   notImplemented()
 
-method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) =
+method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) {.base.} =
   notImplemented()
 
 method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
