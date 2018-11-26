@@ -238,7 +238,6 @@ proc append*(rlpWriter: var RlpWriter, t: Transaction, a: EthAddress) {.inline.}
   else:
     rlpWriter.append(a)
 
-
 proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
   result = fromUnix(rlp.read(int64))
 
