@@ -93,7 +93,7 @@ type
       status*: bool
 
   Receipt* = object
-    stateRootOrStatus*{.rlpCustomSerialization.}: HashOrStatus
+    stateRootOrStatus*: HashOrStatus
     cumulativeGasUsed*: GasInt
     bloom*:         BloomFilter
     logs*:          seq[Log]
@@ -254,17 +254,17 @@ proc append*(rlpWriter: var RlpWriter, t: Transaction, a: EthAddress) {.inline.}
   else:
     rlpWriter.append(a)
 
-proc read*(rlp: var Rlp, t: var Receipt, _: type HashOrStatus): HashOrStatus {.inline.} =
+proc read*(rlp: var Rlp, T: typedesc[HashOrStatus]): T {.inline.} =
   if rlp.blobLen == 1:
     result = hashOrStatus(rlp.read(uint8) == 1)
   else:
     result = hashOrStatus(rlp.read(Hash256))
 
-proc append*(rlpWriter: var RlpWriter, t: Receipt, a: HashOrStatus) {.inline.} =
-  if a.isHash:
-    rlpWriter.append(a.hash)
+proc append*(rlpWriter: var RlpWriter, value: HashOrStatus) {.inline.} =
+  if value.isHash:
+    rlpWriter.append(value.hash)
   else:
-    rlpWriter.append(if a.status: 1'u8 else: 0'u8)
+    rlpWriter.append(if value.status: 1'u8 else: 0'u8)
 
 proc read*(rlp: var Rlp, T: typedesc[Time]): T {.inline.} =
   result = fromUnix(rlp.read(int64))
