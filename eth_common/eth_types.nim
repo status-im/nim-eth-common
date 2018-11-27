@@ -18,13 +18,16 @@ type
 
   BloomFilter* = array[256, byte]
   EthAddress* = array[20, byte]
-  
+
   WhisperIdentity* = array[60, byte]
 
   DifficultyInt* = UInt256
   GasInt* = int64
   ## Type alias used for gas computation
   # For reference - https://github.com/status-im/nimbus/issues/35#issuecomment-391726518
+
+  Topic* = array[32, byte]
+  # topic can be Hash256 or zero padded bytes array
 
   Account* = object
     nonce*:             AccountNonce
@@ -79,12 +82,12 @@ type
 
   Log* = object
     address*:       EthAddress
-    topics*:        seq[int32]
+    topics*:        seq[Topic]
     data*:          Blob
 
   Receipt* = object
-    stateRoot*:     Blob
-    gasUsed*:       GasInt
+    stateRootOrStatus*: Blob
+    cumulativeGasUsed*: GasInt
     bloom*:         BloomFilter
     logs*:          seq[Log]
 
