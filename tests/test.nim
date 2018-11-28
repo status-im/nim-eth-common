@@ -29,3 +29,8 @@ suite "rlp encoding":
     d = y.decode(Receipt)
     check c == a
     check d == b
+
+    check c.hasStateRoot
+    check c.stateRoot == hash
+    check d.hasStatus
+    check d.status == 1

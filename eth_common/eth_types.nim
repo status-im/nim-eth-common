@@ -204,6 +204,20 @@ proc hashOrStatus*(hash: Hash256): HashOrStatus =
 proc hashOrStatus*(status: bool): HashOrStatus =
   HashOrStatus(isHash: false, status: status)
 
+proc hasStatus*(rec: Receipt): bool {.inline.} =
+  rec.stateRootOrStatus.isHash == false
+
+proc hasStateRoot*(rec: Receipt): bool {.inline.} =
+  rec.stateRootOrStatus.isHash == true
+
+proc stateRoot*(rec: Receipt): Hash256 {.inline.} =
+  assert(rec.hasStateRoot)
+  rec.stateRootOrStatus.hash
+
+proc status*(rec: Receipt): int {.inline.} =
+  assert(rec.hasStatus)
+  if rec.stateRootOrStatus.status: 1 else: 0
+
 #
 # Rlp serialization:
 #
@@ -255,6 +269,7 @@ proc append*(rlpWriter: var RlpWriter, t: Transaction, a: EthAddress) {.inline.}
     rlpWriter.append(a)
 
 proc read*(rlp: var Rlp, T: typedesc[HashOrStatus]): T {.inline.} =
+  assert(rlp.blobLen() == 32 or rlp.blobLen() == 1)
   if rlp.blobLen == 1:
     result = hashOrStatus(rlp.read(uint8) == 1)
   else:
