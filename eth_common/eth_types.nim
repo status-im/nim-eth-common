@@ -164,6 +164,10 @@ type
 
   EthResourceRefs = BlockHeaderRef | BlockBodyRef | ReceiptRef
 
+  ValidationResult* {.pure.} = enum
+    OK
+    Error
+
 when BlockNumber is int64:
   ## The goal of these templates is to make it easier to switch
   ## the block number type to a different representation
@@ -370,6 +374,6 @@ method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): Transacti
 method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) {.base.} =
   notImplemented()
 
-method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]) {.base.} =
+method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]): ValidationResult {.base.} =
   notImplemented()
 
