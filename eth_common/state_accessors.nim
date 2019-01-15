@@ -12,7 +12,7 @@ proc getAccount*(db: TrieDatabaseRef,
   else:
     result = newAccount()
 
-proc getContractCode*(chain: AbstractChainDb, req: ContractCodeRequest): Blob =
+proc getContractCode*(chain: AbstractChainDb, req: ContractCodeRequest): Blob {.gcsafe.} =
   let b = chain.getBlockHeader(req.blockHash)
   if b.hasData:
     let acc = getAccount(chain.getStateDb, b.stateRoot, req.key)
