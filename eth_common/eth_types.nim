@@ -319,61 +319,61 @@ template deref*(b: Blob): auto = b
 template deref*(o: Option): auto = o.get
 template deref*(r: EthResourceRefs): auto = r[]
 
-method genesisHash*(db: AbstractChainDB): KeccakHash {.base.} =
+method genesisHash*(db: AbstractChainDB): KeccakHash {.base, gcsafe.} =
   notImplemented()
 
-method getBlockHeader*(db: AbstractChainDB, b: HashOrNum, output: var BlockHeader): bool =
+method getBlockHeader*(db: AbstractChainDB, b: HashOrNum, output: var BlockHeader): bool {.base, gcsafe.} =
   notImplemented()
 
-proc getBlockHeader*(db: AbstractChainDB, hash: KeccakHash): BlockHeaderRef =
+proc getBlockHeader*(db: AbstractChainDB, hash: KeccakHash): BlockHeaderRef {.gcsafe.} =
   new result
   if not db.getBlockHeader(HashOrNum(isHash: true, hash: hash), result[]):
     return nil
 
-proc getBlockHeader*(db: AbstractChainDB, b: BlockNumber): BlockHeaderRef =
+proc getBlockHeader*(db: AbstractChainDB, b: BlockNumber): BlockHeaderRef {.gcsafe.} =
   new result
   if not db.getBlockHeader(HashOrNum(isHash: false, number: b), result[]):
     return nil
 
-method getBestBlockHeader*(self: AbstractChainDB): BlockHeader {.base.} =
+method getBestBlockHeader*(self: AbstractChainDB): BlockHeader {.base, gcsafe.} =
   notImplemented()
 
-method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool {.base.} =
+method getSuccessorHeader*(db: AbstractChainDB, h: BlockHeader, output: var BlockHeader): bool {.base, gcsafe.} =
   notImplemented()
 
-method getBlockBody*(db: AbstractChainDB, blockHash: KeccakHash): BlockBodyRef {.base.} =
+method getBlockBody*(db: AbstractChainDB, blockHash: KeccakHash): BlockBodyRef {.base, gcsafe.} =
   notImplemented()
 
-method getReceipt*(db: AbstractChainDB, hash: KeccakHash): ReceiptRef {.base.} =
+method getReceipt*(db: AbstractChainDB, hash: KeccakHash): ReceiptRef {.base, gcsafe.} =
   notImplemented()
 
-method getStateDb*(db: AbstractChainDB): TrieDatabaseRef {.base.} =
+method getStateDb*(db: AbstractChainDB): TrieDatabaseRef {.base, gcsafe.} =
   notImplemented()
 
-method getCodeByHash*(db: AbstractChainDB, hash: KeccakHash): Blob {.base.} =
+method getCodeByHash*(db: AbstractChainDB, hash: KeccakHash): Blob {.base, gcsafe.} =
   notImplemented()
 
-method getSetting*(db: AbstractChainDb, key: string): Bytes {.base.} =
+method getSetting*(db: AbstractChainDb, key: string): Bytes {.base, gcsafe.} =
   notImplemented()
 
-method setSetting*(db: AbstractChainDb, key: string, val: openarray[byte]) {.base.} =
+method setSetting*(db: AbstractChainDb, key: string, val: openarray[byte]) {.base, gcsafe.} =
   notImplemented()
 
-method getHeaderProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base.} =
+method getHeaderProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base, gcsafe.} =
   notImplemented()
 
-method getProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base.} =
+method getProof*(db: AbstractChainDB, req: ProofRequest): Blob {.base, gcsafe.} =
   notImplemented()
 
-method getHelperTrieProof*(db: AbstractChainDB, req: HelperTrieProofRequest): Blob {.base.} =
+method getHelperTrieProof*(db: AbstractChainDB, req: HelperTrieProofRequest): Blob {.base, gcsafe.} =
   notImplemented()
 
-method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): TransactionStatusMsg {.base.} =
+method getTransactionStatus*(db: AbstractChainDB, txHash: KeccakHash): TransactionStatusMsg {.base, gcsafe.} =
   notImplemented()
 
-method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) {.base.} =
+method addTransactions*(db: AbstractChainDB, transactions: openarray[Transaction]) {.base, gcsafe.} =
   notImplemented()
 
-method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]): ValidationResult {.base.} =
+method persistBlocks*(db: AbstractChainDB, headers: openarray[BlockHeader], bodies: openarray[BlockBody]): ValidationResult {.base, gcsafe.} =
   notImplemented()
 
